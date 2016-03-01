@@ -1,0 +1,32 @@
+- hosts: all
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: ensure apt-cached is updated
+      apt: update_cache=yes cache_valid_time=3600
+
+    - name: ensure apt key for node is installed
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+
+    - name: ensure node ppa is installed
+      apt_repository:
+        repo: deb https://deb.nodesource.com/node_4.x trusty main
+        state: present
+
+    - name: ensure apt packages are installed
+      apt: name={{item}} state=present update_cache=true
+      with_items:
+        - nodejs
+        - nginx
+
+    - name: ensure default nginx server is not present
+      file: path=/etc/nginx/sites-enabled/default state=absent
+
+    - name: ensure nginx is configured
+      template: src=nginx.conf dest=/etc/nginx/conf.d
+
+    - name: ensure nginx has been restarted
+      service: name=nginx state=restarted
