@@ -4,7 +4,7 @@ const host = process.env.HOST || '0.0.0.0';
 const http = require('http');
 
 function handler (request, response) {
-  res.send(request.headers);
+  response.send(request.headers);
 }
 
 http.createServer(handler).listen(port, function(){
